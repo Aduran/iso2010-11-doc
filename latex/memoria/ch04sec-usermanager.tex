@@ -1,10 +1,6 @@
-\section{Caso de Uso: Registrarse}
+\section{Clase UserManager}
 
-\subsection{Análisis y diseño}
-
-\subsection{Implementación}
-
-\subsection{Informe de pruebas}
+\subsection{UserManager::registerUser}
 
 {\small
 \begin{tabular}{r|l}
@@ -14,8 +10,6 @@ Fecha de finalización & 30 de enero de 2011 \\
 Código bajo prueba & \texttt{UserManager::registerUser}
 \end{tabular}
 }
-
-\subsubsection{Pruebas de desarrollo}
 
 A continuación se detallarán las pruebas de desarrollo (Pruebas unitarias con \textit{Junit}).
 
@@ -44,6 +38,7 @@ El criterio elegido para todos los valores de prueba (test data) ha sido: Añadi
 La estrategia para obtener los casos de prueba elegida ha sido
 \textit{each choice} (Test 1 a 3 y 8 a 12 ) y añadir algunos casos
 interesantes (Test 4 a 7).
+El test 13 se ha elaborado para ver el comportamiento de registerUser cuando el servidor se ha desconectado.
 
 Para elegir tanto los valores de prueba como los casos de pruebas se ha analizado el comportamiento de este caso de uso (caja blanca). Tras este análisis se ha llegado a la conclusión de que hay en dos lugares en los que se pueden encontrar errores: Si al método registerUser se le da un parámetro erróneo (throw InvalidArgumentException), o si el nombre del usuario ya existe en el servidor (throw UserAlreadyExistsException). La primera comprobación es local, por ello si se lanza la excepcion InvalidArgumentException no se hará nada en el servidor y no se analizará si el usuario ya existe o no.
 
@@ -71,31 +66,79 @@ Test10 & (JorgeCA, jorge, jorge@gmail) & email & InvalidArgument\\
 Test11& (JorgeCA, jorge, jorge@gmail.) & email  & InvalidArgument\\
 Test12& (LuisAn, luis, luis@gmail.com) & email  &  El usuario \\
 & &  & queda registrado\\
+Test13& (Angel\&Duran, angel, a@d.com)  & Comportamiento registerUser & RemoteException \\
 \hline
 \end{longtable}
 }
 
-\subsubsection{Pruebas exploratorias}
+\subsection{UserManager::login}
 
-A continuación se muestra un guión de pruebas exploratorias para cada uno de los escenarios posibles:
-\begin{enumerate}
-\item Todos los datos son válidos y el usuario no existe.
-	\begin{itemize}
-	\item Acciones previas: El servidor debe estar funcionando y no tener un usuario con el nombre LuisAn.
-	\item Acciones de prueba : En la ventana de inicio pinchamos en registrarnos y rellenamos el diálogo que nos aparecerá con los siguientes valores: LuisAn, luis, luis@gmail.com.
-	\item Resultados esperados : Tras pulsar en aceptar  desaparecerá el diálogo de registro y en la parte superior de la ventana de inicio nos aparecerá en verde \emph {Usuario : LuisAn registrado"}.
-	\end{itemize}
-\item Todos los datos son válidos, pero el usuario existe.
-	\begin{itemize}
-	\item Acciones previas: El servidor debe estar funcionando y no tener un usuario con el nombre JorgeCA.
-	\item Acciones de prueba : En la ventana de inicio pinchamos en registrarnos y rellenamos el diálogo que nos aparecerá con los siguientes valores: JorgeCA, jorge, jorge.colao@gmail.com.
-	\item Resultados esperados : Tras pulsar en aceptar desaparecerá el diálogo de registro y en la parte superior de la ventana de inicio nos aparecerá en rojo \emph {El servidor indica: Error en el registro}.
-	\end{itemize}
+{\small
+\begin{tabular}{r|l}
+Nombre del \textit{tester} & Angel Durán Izquierdo \\
+Fecha de asignación & 27 de enero de 2011 \\
+Fecha de finalización & 2 de febrero de 2011 \\
+Código bajo prueba & \texttt{UserManager::createSession}
+\end{tabular}
+}
 
-\item Algún dato introducido en el diálogo no es válido, independientemente de que el usuario exista o no.
-	\begin{itemize}
-	\item Acciones previas: El servidor debe estar funcionando.
-	\item Acciones de prueba : En la ventana de inicio pinchamos en registranos y rellenamos el diálogo que nos aparecerá con los siguientes valores: JorgeCA, jorge, jorge@gmail..
-	\item Resultados esperados : Tras pulsar en aceptar desaparecerá el diálogo de registro y aparecerá un panel de error mostrando \emph{Algún argumento es erroneo}. Despues de pulsar aceptar en el panel, volverá a aparecer el diálogo. Esto sucederá hasta que los datos sean correctos o demos a cancelar.
-	\end{itemize}
-\end{enumerate}
+A continuación se detallarán las pruebas de desarrollo (Pruebas unitarias con \textit{JUnit}).
+
+Lista de los valores de prueba para cada atributo.
+El criterio elegido para todos los valores de prueba (test data) ha sido: Añadir valores interesantes propensos a error (Conjetura de error).
+
+\begin{itemize}
+\item \textbf{\texttt{login}}
+\subitem \textit{null}
+\subitem Cadena vacía
+\subitem Usuario existente: \texttt{Angel}
+\subitem Usuario no existente: \texttt{ADuran}
+\subitem Nombre de usuario registrado pero introducido con mayusculas: \texttt{ADuran}
+\subitem Usuario existente con carácteres especiales: \texttt {Angel\&Duran}
+\subitem Usuario existente con numeros: \texttt{1111, -1}
+
+\item \textbf{\texttt{passwd}}
+\subitem \textit{null}
+\subitem Cadena vacía
+\subitem Cadenas no vacías: \texttt{angel}
+\subitem Cadenas con carácteres especiales: \texttt{22\&22}
+\subitem Cadenas con numeros: \texttt{2222}
+
+\end{itemize}
+
+La estrategia para obtener los casos de prueba elegida ha sido
+\textit{each choice} eligiendo los casos mas interesantes.
+
+Para elegir tanto los valores de prueba como los casos de pruebas se ha analizado el comportamiento de este caso de uso (caja blanca). Tras este análisis se ha llegado a la conclusión de que hay en dos lugares en los que se pueden encontrar errores: Si al método createSession se le da un parámetro erróneo (throw InvalidArgumentException), o si el nombre del usuario no se ha registrado en el servidor (throw UserAlreadyExistsException).
+
+Por otro lado se comprueba si al crear una sesion cuando ya se existía una, la anterior se cierra correctamente.
+
+
+Teniendo en cuenta las consideraciones anteriormente mencionadas, la tabla completa de los casos de prueba y los resultados esperados son:
+
+{\footnotesize
+\begin{longtable}[c]{lccc}
+ & \textbf{Valores de Prueba} & \textbf{Objetivo del test} & \textbf{Resultado esperado} \\
+\hline \hline
+\endhead
+
+Test1 & (vacío, vacío)  & login-pass & InvalidArgument\\
+Test2 & (Aduran, vacío) & pass & InvalidArgument\\
+Test3 & (vacío, angel) & login & UserAlreadyExistst\\
+Test4 & (Aduran, angel) & login-pass   & Sesión creada correctamente\\
+Test5 & (null, angel) & login   & InvalidArgument\\
+Test6 & (Aduran, null) & pass   & InvalidArgument\\
+Test7 & (null, null) & login-pass   & InvalidArgument\\
+Test8 & (ADuran, angel) & login & WrongLoginException\\
+Test9 & (Aduran, Angel) & pass & WrongLoginException\\
+Test10 & (1111, 22\&22) & login-pass & Sesión creada correctamente\\
+Test11& (-1, 2222) & login-pass  & Sesión creada correctamente\\
+Test12& (Angel\&Duran, angel) & login  &  Sesión creada correctamente \\
+Test13 & (Aduran y ricki, angel y ricki) & Comportamiento createSession & Sesión creada correctamente\\
+Test14 & (Aduran, angel) & Comportamiento createSession & RemoteException\\
+Test15 & (Aduran, angel) & Comportamiento createSession & Sesión cerrada correctamente\\
+Test16 & (Aduran, angel) & Comportamiento createSession & Sesión creada correctamente\\
+
+\hline
+\end{longtable}
+}
